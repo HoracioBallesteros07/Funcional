@@ -64,6 +64,24 @@ robotEnergia8 = Robot {
     programas = [descargaElectrica, recargarBateria 15, olvidarProgramas 1]
 }
 
+--ACADEMIAS
+academia1 :: Academia
+academia1 = [robotBasico, robotRecargado, robotComplejo]
+
+academiaConAtlas :: Academia
+academiaConAtlas = [robotBasico, robotRecargado, robotComplejo, robotATLAS]
+academiaViejosObstinados :: Academia
+academiaViejosObstinados = [
+    Robot "Anciano1" 17 40 (replicate 52 descargaElectrica),  -- obstinado
+    Robot "Anciano2" 18 30 (replicate 55 descargaElectrica)   -- obstinado
+  ]
+
+academiaNoObstinados :: Academia
+academiaNoObstinados = [
+    Robot "Anciano1" 17 40 [descargaElectrica],               -- NO obstinado
+    Robot "Anciano2" 15 30 [recargarBateria 5]                -- joven, pasa
+  ]
+
 --PUNTOS
 
 --recargarBateria: Este programa recibe un robot y lo recarga, aumentando su energía en una cantidad variable.
@@ -101,3 +119,32 @@ danio r p =
 --diferenciaDePoder: La diferencia absoluta en poder entre dos robots
 diferenciaDePoder :: Robot -> Robot -> Int
 diferenciaDePoder r1 r2 = abs(poder r1 - poder r2)
+
+
+--Consultas sobre la Academia
+-- ¿Todos los robots viejos (experiencia > 16) son obstinados?
+sonViejosObstinados :: Academia -> Bool
+sonViejosObstinados = all (
+   \r -> experiencia r <= 16 || length (programas r) > 3 * experiencia r)
+
+--Funcion Auxiliar (f)
+--Devuelve el elemento de la lista que maximiza una funcion x.Applicative
+f :: Ord b => (a -> b) -> [a] -> a
+f x = foldl1 (\a b -> if x a >= x b then a else b)
+
+--mejorProgramaContra
+-- Elige el programa del segundo robot que cause mayor reduccion de energia al primero.
+mejorProgramaContra :: Robot -> Robot -> Programa
+mejorProgramaContra r1 r2 = f (danio r1) (programas r2)
+
+--mejorOponente
+--Encuentra el robot con la mayor diferencia de poder respecto al robot recibido.
+mejorOponente :: Robot -> Academia -> Robot
+mejorOponente r = f (diferenciaDePoder r)
+
+--noPuedeDerrotarle
+--Tras aplicar todos los programas que conoce al segundo robot, la energia del primero queda igual que antes.
+noPuedeDerrotarle :: Robot -> Robot -> Bool
+noPuedeDerrotarle atacante defensor = 
+    energia atacante == energia (foldl (
+        \r prog -> prog r) defensor (programas atacante))
