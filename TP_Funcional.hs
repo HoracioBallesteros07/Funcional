@@ -75,3 +75,29 @@ descargaElectrica :: Programa
 descargaElectrica robot
     | energia robot > 10 = robot { energia = energia robot - 10 }
     | otherwise = robot { energia = energia robot `div` 2 }
+
+--olvidarProgramas: Hace que el robot que lo recibe olvide los primeros N programas que conoce.
+olvidarProgramas :: Int -> Programa
+olvidarProgramas n robot = robot { programas = drop n (programas robot) }
+
+--autoAtaque: El robot objetivo se ataca a sí mismo usando su primer programa registrado. Lanzar error si no tiene ningún programa.
+autoAtaque :: Programa
+autoAtaque robot =
+    case programas robot of
+        [] -> error "El robot no tiene programas para autoatacarse."
+        (p:_) -> p robot
+
+--poder: Calcula la fuerza de un robot sumando su energía más el producto de su nivel de experiencia por la cantidad de programas que tiene.
+poder :: Robot -> Int
+poder r = energia r + experiencia r + length (programas r)
+
+--danio: Calcula cuánta energía se pierde o gana al aplicar un programa a un robot. La ganancia se indica con un número negativo. La función retorna 0 si no hay cambio.
+danio :: Robot -> Programa -> Int
+danio r p =
+    let energiaAntes = energia r
+        energiaDespues = energia (p r)
+    in energiaAntes - energiaDespues
+
+--diferenciaDePoder: La diferencia absoluta en poder entre dos robots
+diferenciaDePoder :: Robot -> Robot -> Int
+diferenciaDePoder r1 r2 = abs(poder r1 - poder r2)
