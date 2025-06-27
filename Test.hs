@@ -28,7 +28,25 @@ test = do
     putStrLn "== Test 7: diferenciaDePoder =="
     print $ diferenciaDePoder robotBasico robotComplejo == 16
 
+    putStrLn "== Test 8: existeAtlasSinProgramas =="
+    let robotATLAS = Robot "Atlas" 5 60 []
+    print $ existeAtlasSinProgramas [robotBasico, robotComplejo] == False
+    print $ existeAtlasSinProgramas [robotATLAS] == True
 
+    putStrLn "== Test 9: sonViejosObstinados =="
+    let viejoBueno = Robot "Old1" 17 50 (replicate 52 descargaElectrica)
+    let viejoMalo  = Robot "Old2" 17 50 [descargaElectrica]
+    print $ sonViejosObstinados [viejoBueno] == True
+    print $ sonViejosObstinados [viejoMalo] == False
+    print $ sonViejosObstinados [robotBasico] == True
+
+    putStrLn "== Test 10: mejorProgramaContra =="
+    let prog = mejorProgramaContra robotBasico robotComplejo
+    print $ energia (prog robotBasico) == 40
+
+    putStrLn "== Test 11: mejorOponente =="
+    let academia1 = [robotBasico, robotRecargado, robotComplejo]
+    print $ nombre (mejorOponente robotBasico academia1) == "R3"
 
 
     -- Función auxiliar para capturar el error del autoAtaque
