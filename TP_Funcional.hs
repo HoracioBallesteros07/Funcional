@@ -120,6 +120,11 @@ danio r p =
 diferenciaDePoder :: Robot -> Robot -> Int
 diferenciaDePoder r1 r2 = abs(poder r1 - poder r2)
 
+--Consultas sobre la Academia
+-- ¿Existe en la Academia algun robot llamado 'Atlas' que actualmente no tenga programas?
+existeAtlasSinProgramas :: Academia -> Bool
+existeAtlasSinProgramas = any (
+    \r -> nombre r == "Atlas" && null (programas r))
 
 --Consultas sobre la Academia
 -- ¿Todos los robots viejos (experiencia > 16) son obstinados?
@@ -148,3 +153,81 @@ noPuedeDerrotarle :: Robot -> Robot -> Bool
 noPuedeDerrotarle atacante defensor = 
     energia atacante == energia (foldl (
         \r prog -> prog r) defensor (programas atacante))
+
+--Test Manual
+
+--ghci> recargarBateria 25 robotBasico
+--Robot { nombre = "R1", experiencia = 2, energia = 75, programas = <funciones> }
+
+--ghci> descargaElectrica robotBasico
+--Robot { robotId = "R1", experiencia = 2, energia = 40, programas = <funciones> }
+
+--ghci> descargaElectrica robotEnergia8 
+--Robot { robotId = "R4", experiencia = 3, energia = 4, programas = <funciones> }
+
+--ghci> programas (olvidarProgramas 1 robotComplejo)
+--ghci> length (programas (olvidarProgramas 1 robotComplejo))
+--2
+
+--ghci> autoAtaque robotBasico
+--Robot { robotId = "*** Exception: Sin programas para atacar
+--CallStack (from HasCallStack):
+--  error, called at TP.hs:35:39 in main:Robots
+
+--ghci> poder robotBasico
+--52
+
+--ghci> poder robotComplejo
+--36
+
+--ghci> danio robotBasico (recargarBateria 10)
+---10
+
+--ghci> danio robotComplejo descargaElectrica
+--10
+
+--ghci> diferenciaDePoder robotBasico robotComplejo
+--11
+
+--ghci> length (programas (olvidarProgramas 1 robotComplejo))
+--2
+
+--ghci> existeAtlasSinProgramas [robotBasico, robotComplejo]
+--False
+
+--ghci> existeAtlasSinProgramas [robotATLAS]
+--True
+
+--ghci> sonViejosObstinados [Robot "Old1" 17 50 (replicate 60 descargaElectrica)]
+--True
+
+--ghci> sonViejosObstinados [Robot "Old2" 17 50 [descargaElectrica]]
+--False
+
+--ghci> sonViejosObstinados [robotBasico]
+--True
+
+--ghci> energia (descargaElectrica robotBasico)
+--40
+
+--ghci> let prog = mejorProgramaContra robotBasico robotComplejo
+--ghci> energia (prog robotBasico) == 40
+--True
+
+--ghci> energia (mejorProgramaContra robotBasico robotComplejo robotBasico)
+--40
+
+--ghci> existeAtlasSinProgramas academia1
+--False
+
+--ghci> existeAtlasSinProgramas academiaConAtlas
+--True
+
+--ghci> sonViejosObstinados academiaViejosObstinados
+--True
+
+--ghci> sonViejosObstinados academiaNoObstinados
+--False
+
+--ghci> mejorOponente robotBasico academia1
+--Robot { nombre = "R3", experiencia = 3, energia = 30, programas = <funciones> }
